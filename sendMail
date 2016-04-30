@@ -1,0 +1,13 @@
+
+import smtplib
+
+def sendMail(sender, senderPassword, receiver, msg):
+    # defaults to yahoo mail server, because gmail will block attempt to send outside of webpage
+    s = smtplib.SMTP("smtp.mail.yahoo.com",587)
+    s.ehlo()
+    s.starttls()
+    s.login(sender,senderPassword)
+    s.sendmail(sender, receiver, msg)
+    s.quit
+    print('Email has been sent!')
+    s.quit()
