@@ -1,0 +1,73 @@
+# Program written in Python 3.5.1
+# Purpose of program is to scrape GRRM's most recent blog post for info on TWOW and send to email address
+
+
+import bs4, re, requests, smtplib
+
+def setupWebpage(webpage):
+    # this gets the webpage into a format that python likes
+    page = requests.get(webpage)
+    page.raise_for_status()
+    pageSoup = bs4.BeautifulSoup(page.text, 'html.parser')
+    type(pageSoup)
+    return pageSoup
+
+def searchForTitle(parsedData):
+    # searches formatted webpage for blog post titles
+    title = parsedData.select('.subj-link')
+    title = str(title[0])
+    return title
+
+def searchForParagraph(parsedData):
+    # this fetches the associated paragraph for most recent post
+    content = parsedData.select('.asset-body')
+    content = str(content[0])
+    return content
+
+def searchForWinds():
+    # this searches paragraph for any instance of "Winds of Winter", "WoW", "Winds", or "TWOW"
+    content = searchForParagraph(setupWebpage('http://grrm.livejournal.com/'))
+    findWinds = re.compile(r'Winds of Winter|WoW|Winds|TWOW')
+    search = findWinds.search(content)
+    try:
+        search = search.group()
+    except:
+        search = 'None'
+    if search != 'None':
+        return "Winds of Winter is mentioned in the post! Praise be to R'hllor!"
+    else:
+        return 'Winds of Winer not mentioned. Seven save us!'
+
+def splitTitle():
+    # formats title to exclude html
+    title = searchForTitle(setupWebpage('http://grrm.livejournal.com/'))
+    start = title.index('>') + len('>')
+    end = title.index('</a>', start)
+    return title[start:end]
+
+def emailContent():
+    # populates email message
+    title = splitTitle()
+    content = searchForWinds()
+    return 'Most recent post on "Not a Blog": ' + str(title) + '\n' + searchForWinds()
+
+def sendMail(sender, senderPassword, receiver, msg):
+    # use yahoo because gmail will throw a tantrum
+    s = smtplib.SMTP("smtp.mail.yahoo.com",587)
+    s.ehlo()
+    s.starttls()
+    s.login(sender,senderPassword)
+    s.sendmail(sender, receiver, msg)
+    s.quit
+    print('Email has been sent.')
+    s.quit()
+    
+def main(webpage):
+    # default program prompts for senderEmail, password, etc. Delete input assignments
+    # and enter parameters into sendMail(...) directly if you'd like to go quicker
+    senderEmail = str(input('Enter the "sent from" email address (Must be Yahoo!): '))
+    senderPassword = str(input('Enter the associated password with sender email: '))
+    receiver = str(input('Enter the email address you would like to send to: '))
+    print('One sec...')
+    sendMail(senderEmail, senderPassword, receiver, emailContent())
+
