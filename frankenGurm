@@ -1,7 +1,6 @@
 # Program written in Python 3.5.1
 # Purpose of program is to scrape GRRM's most recent blog post for info on TWOW and send to email address
 
-
 import bs4, re, requests, smtplib
 
 def setupWebpage(webpage):
