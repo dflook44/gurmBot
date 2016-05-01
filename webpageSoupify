@@ -1,0 +1,8 @@
+import bs4, requests
+
+def setupWebpage(webpage):
+  page = requests.get(webpage)
+  page.raise_for_status()
+  pageSoup = bs4.BeautifulSoup(page.text, 'html.parser')
+  type(pageSoup)
+
