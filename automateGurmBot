@@ -1,12 +1,7 @@
-import gurmBot
-from datetime import datetime
-from threading import Timer
+# for now, will upload code to heroku and run on continuous loop
 
-x=datetime.today()
-y=x.replace(day=x.day, hour=15, minute=30, second=0, microsecond=0)
-delta_t=y-x
+import gurmBot, time
 
-secs=delta_t.seconds+1
-
-t = Timer(secs, gurmBot.main('http://grrm.livejournal.com/'))
-t.start()
+while True:
+  gurmBot.main()
+  time.sleep(1800)
